@@ -470,11 +470,11 @@
         <div class="road-dash"></div>
     </div>
     <!-- Vertical road left-center -->
-    <div class="road road-v" style="left:460px; top:430px;">
+    <div class="road road-v" style="left:430px; top:430px;">
         <div class="road-dash-v"></div>
     </div>
     <!-- Vertical road right-center -->
-    <div class="road road-v" style="left:920px; top:430px;">
+    <div class="road road-v" style="left:830px; top:430px;">
         <div class="road-dash-v"></div>
     </div>
 
@@ -483,8 +483,8 @@
     <div class="packet" style="top:550px; animation: packetRight 8s linear infinite 2s;"></div>
     <div class="packet" style="top:735px; animation: packetRight 5s linear infinite 1s;"></div>
     <div class="packet" style="top:740px; animation: packetRight 7s linear infinite 3s;"></div>
-    <div class="packet" style="left:475px; animation: packetDown 5s linear infinite;"></div>
-    <div class="packet" style="left:935px; animation: packetDown 6s linear infinite 1.5s;"></div>
+    <div class="packet" style="left:445px; animation: packetDown 5s linear infinite;"></div>
+    <div class="packet" style="left:845px; animation: packetDown 6s linear infinite 1.5s;"></div>
 
     <!-- Road label -->
     <div style="position:absolute; top:760px; left:50%; transform:translateX(-50%); z-index:6; text-align:center;">
@@ -495,8 +495,8 @@
     </div>
 
 
-    <!-- ===== UNIVERSITY (Foundation Models / LLMs) ===== -->
-    <div class="building" style="top:280px; left:120px;">
+    <!-- ===== UNIVERSITY (Foundation Models / LLMs) — Row 1 center ===== -->
+    <div class="building" style="top:280px; left:520px;">
         <div class="bld-body">
             <svg class="uni-svg" viewBox="0 0 140 110">
                 <!-- Main building -->
@@ -619,8 +619,8 @@
         <div class="bld-sub">Where agents learn (GPT, Claude, Gemini)<br>Hover to look inside</div>
     </div>
 
-    <!-- ===== PUBLIC LIBRARY (HDD) — Center-left ===== -->
-    <div class="building" style="top:580px; left:140px;">
+    <!-- ===== PUBLIC LIBRARY (HDD) — Row 2 left ===== -->
+    <div class="building" style="top:580px; left:200px;">
         <div class="bld-body">
             <svg viewBox="0 0 110 90" style="width:110px;height:90px;">
                 <rect x="10" y="30" width="90" height="55" rx="3" fill="#3d2b1a" stroke="#8B6914" stroke-width="1.5"/>
@@ -656,8 +656,8 @@
         </div>
     </div>
 
-    <!-- ===== OFFICE TOWER (GPU) — Center, prominent ===== -->
-    <div class="building" style="top:240px; left:640px;">
+    <!-- ===== OFFICE TOWER (GPU) — Row 1 right ===== -->
+    <div class="building" style="top:240px; left:1000px;">
         <div class="bld-body">
             <svg class="office-svg" viewBox="0 0 120 140">
                 <!-- Main tower -->
@@ -785,7 +785,7 @@
     </div>
 
     <!-- ===== SALARY = TOKENS (flowing INTO office from left) ===== -->
-    <div style="position:absolute; top:260px; left:480px; z-index:7;">
+    <div style="position:absolute; top:260px; left:840px; z-index:7;">
         <svg width="170" height="130" viewBox="0 0 170 130">
             <path d="M 10,50 C 50,50 80,60 155,60" fill="none" stroke="#d97706" stroke-width="1.5" opacity="0.3" stroke-dasharray="6,4">
                 <animate attributeName="stroke-dashoffset" values="0;-20" dur="1.5s" repeatCount="indefinite"/>
@@ -829,7 +829,7 @@
         </svg>
     </div>
     <!-- Salary = Tokens label -->
-    <div style="position:absolute; top:258px; left:440px; z-index:8; text-align:right; width:140px;">
+    <div style="position:absolute; top:258px; left:800px; z-index:8; text-align:right; width:140px;">
         <div style="font-size:0.95rem; font-weight:900; color:#facc15; text-shadow: 0 0 12px rgba(250,204,21,0.3); letter-spacing:1px;">TOKENS IN</div>
         <div style="font-size:0.95rem; color:#d97706; font-weight:900; margin-top:3px; letter-spacing:1px;">= SALARY</div>
         <div style="font-size:0.55rem; color:#92400e; margin-top:2px;">What you pay agents to work.</div>
@@ -837,7 +837,7 @@
     </div>
 
     <!-- ===== GDP OUTPUT (flowing out of office to the right) ===== -->
-    <div style="position:absolute; top:280px; left:770px; z-index:7;">
+    <div style="position:absolute; top:280px; left:1130px; z-index:7;">
         <svg width="200" height="120" viewBox="0 0 200 120">
             <path d="M 0,60 C 30,60 40,40 70,40 L 140,40" fill="none" stroke="#facc15" stroke-width="2" opacity="0.4" stroke-dasharray="6,4">
                 <animate attributeName="stroke-dashoffset" values="20;0" dur="1.5s" repeatCount="indefinite"/>
@@ -866,15 +866,15 @@
         </svg>
     </div>
     <!-- Output = GDP label -->
-    <div style="position:absolute; top:258px; left:940px; z-index:8; text-align:left; width:140px;">
+    <div style="position:absolute; top:258px; left:1280px; z-index:8; text-align:left; width:140px;">
         <div style="font-size:0.95rem; font-weight:900; color:#facc15; text-shadow: 0 0 12px rgba(250,204,21,0.3); letter-spacing:1px;">OUTPUT</div>
         <div style="font-size:0.95rem; color:#d97706; font-weight:900; margin-top:3px; letter-spacing:1px;">= GDP</div>
         <div style="font-size:0.55rem; color:#92400e; margin-top:2px;">Tasks completed, code written,</div>
         <div style="font-size:0.55rem; color:#92400e;">decisions made, analyses run.</div>
     </div>
 
-    <!-- ===== HOUSES (CPU) — Right side, residential ===== -->
-    <div class="building" style="top:590px; left:1020px;">
+    <!-- ===== HOUSES (CPU) — Row 1 left ===== -->
+    <div class="building" style="top:400px; left:80px;">
         <div class="bld-body">
             <svg class="house-svg" viewBox="0 0 100 90">
                 <rect x="15" y="40" width="70" height="45" rx="2" fill="#2d4a2d" stroke="#538135" stroke-width="1.5"/>
@@ -900,7 +900,7 @@
     </div>
 
     <!-- Second house -->
-    <div class="building" style="top:610px; left:1170px;">
+    <div class="building" style="top:420px; left:210px;">
         <div class="bld-body">
             <svg class="house-svg" viewBox="0 0 100 90" style="width:80px;height:72px;">
                 <rect x="15" y="40" width="70" height="45" rx="2" fill="#2d4a2d" stroke="#538135" stroke-width="1.5"/>
@@ -912,7 +912,7 @@
         </div>
     </div>
     <!-- Third house -->
-    <div class="building" style="top:625px; left:1280px;">
+    <div class="building" style="top:435px; left:310px;">
         <div class="bld-body">
             <svg class="house-svg" viewBox="0 0 100 90" style="width:70px;height:63px;">
                 <rect x="15" y="40" width="70" height="45" rx="2" fill="#2d4a2d" stroke="#538135" stroke-width="1.5"/>
@@ -924,8 +924,8 @@
         </div>
     </div>
 
-    <!-- ===== POWER PLANT / FARM (Electricity) — Bottom left ===== -->
-    <div class="building" style="top:820px; left:100px;">
+    <!-- ===== POWER PLANT / FARM (Electricity) — Row 2 right ===== -->
+    <div class="building" style="top:580px; left:900px;">
         <div class="bld-body">
             <svg class="power-svg" viewBox="0 0 130 100">
                 <rect x="0" y="70" width="130" height="30" rx="2" fill="#1a3520"/>
@@ -965,18 +965,18 @@
 
     <!-- Power lines from farm to buildings -->
     <svg style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:3;pointer-events:none;">
+        <!-- Power line to houses -->
+        <line x1="920" y1="600" x2="200" y2="450" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
         <!-- Power line to university -->
-        <line x1="160" y1="830" x2="190" y2="420" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+        <line x1="940" y1="590" x2="590" y2="400" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
         <!-- Power line to office -->
-        <line x1="220" y1="830" x2="700" y2="420" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
-        <!-- Power line to residential -->
-        <line x1="220" y1="850" x2="1070" y2="620" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+        <line x1="980" y1="590" x2="1060" y2="420" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
         <!-- Power line to library -->
-        <line x1="160" y1="830" x2="200" y2="700" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+        <line x1="920" y1="620" x2="300" y2="630" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
     </svg>
 
     <!-- Agent commute annotation -->
-    <div style="position:absolute; top:505px; left:660px; z-index:6; text-align:center;">
+    <div style="position:absolute; top:505px; left:550px; z-index:6; text-align:center;">
         <div style="font-size:0.55rem; color:rgba(255,255,255,0.3); font-style:italic;">Agents commuting between home and office</div>
         <div style="font-size:0.5rem; color:rgba(255,255,255,0.2);">(Latency = commute time)</div>
     </div>
@@ -1025,7 +1025,7 @@
     </div>
 
     <!-- Agent on left vertical road -->
-    <div class="agent" style="left:455px; animation: walkDown 20s linear infinite 2s;">
+    <div class="agent" style="left:425px; animation: walkDown 20s linear infinite 2s;">
         <svg width="24" height="30" viewBox="0 0 28 36">
             <circle cx="14" cy="8" r="7" fill="#f59e42"/>
             <rect x="8" y="15" width="12" height="14" rx="3" fill="#f59e42"/>
@@ -1039,7 +1039,7 @@
     </div>
 
     <!-- Agent on right vertical road -->
-    <div class="agent" style="left:915px; animation: walkUp 25s linear infinite;">
+    <div class="agent" style="left:825px; animation: walkUp 25s linear infinite;">
         <svg width="24" height="30" viewBox="0 0 28 36">
             <circle cx="14" cy="8" r="7" fill="#ef4444"/>
             <rect x="8" y="15" width="12" height="14" rx="3" fill="#ef4444"/>
@@ -1067,7 +1067,7 @@
     </div>
 
     <!-- ===== RESIDENTIAL SIGN ===== -->
-    <div style="position:absolute; top:570px; left:1020px; z-index:6;">
+    <div style="position:absolute; top:380px; left:100px; z-index:6;">
         <svg viewBox="0 0 130 60" style="width:130px;height:60px;">
             <rect x="60" y="35" width="4" height="25" fill="#666"/>
             <rect x="5" y="3" width="115" height="34" rx="5" fill="#1a3520" stroke="#538135" stroke-width="1.5"/>
