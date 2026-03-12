@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenomics — The Agent Economy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+        :root {
+            --sky-top: #0b1628;
+            --sky-bot: #1a2a4a;
+            --ground: #1a2f1a;
+            --road: #2a2a2a;
+            --road-line: #f59e42;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--sky-top);
+            color: #e4e6ed;
+            overflow-x: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            text-align: center;
+            padding: 40px 20px 10px;
+            position: relative;
+            z-index: 10;
+        }
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, #4f8cff, #22d3ee, #36d399, #facc15);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p { color: #6b7280; font-size: 1rem; margin-top: 4px; }
+
+        /* ===== WORLD CANVAS ===== */
+        .world {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 1050px;
+            margin: 20px auto 0;
+            overflow: visible;
+        }
+
+        /* Sky gradient */
+        .sky {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 500px;
+            background: linear-gradient(180deg, #0b1628 0%, #122040 40%, #1a3055 70%, #1f3d6d 100%);
+        }
+        /* Stars */
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Ground */
+        .ground {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 620px;
+            background: linear-gradient(180deg, #1a3520 0%, #15291a 50%, #0f1f14 100%);
+        }
+
+        /* Road */
+        .road {
+            position: absolute;
+            background: #333;
+            border-top: 3px solid #555;
+            border-bottom: 3px solid #555;
+        }
+        .road-h {
+            height: 40px;
+            left: 0; right: 0;
+        }
+        .road-v {
+            width: 40px;
+            top: 0; bottom: 0;
+        }
+        .road-dash {
+            position: absolute;
+            background: repeating-linear-gradient(90deg, #f59e42 0px, #f59e42 20px, transparent 20px, transparent 40px);
+            height: 3px;
+            left: 0; right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .road-dash-v {
+            position: absolute;
+            background: repeating-linear-gradient(180deg, #f59e42 0px, #f59e42 20px, transparent 20px, transparent 40px);
+            width: 3px;
+            top: 0; bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* ===== BUILDINGS / LOCATIONS ===== */
+        .building {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 5;
+            cursor: default;
+            transition: transform 0.3s;
+        }
+        .building:hover {
+            transform: scale(1.05);
+            z-index: 20;
+        }
+        .building:has(.office-popup):hover,
+        .building:has(.uni-popup):hover {
+            transform: none;
+            z-index: 50;
+        }
+        .uni-popup {
+            position: absolute;
+            top: -20px;
+            left: 155px;
+            width: 300px;
+            height: 230px;
+            background: rgba(12,15,25,0.97);
+            border: 1.5px solid #a78bfa;
+            border-radius: 14px;
+            z-index: 50;
+            opacity: 0;
+            transform: scale(0.9) translateX(-10px);
+            transition: opacity 0.35s, transform 0.35s;
+            pointer-events: none;
+            overflow: hidden;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.7), 0 0 20px rgba(167,139,250,0.15);
+        }
+        .building:hover .uni-popup {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+        }
+        .uni-popup-header {
+            background: rgba(167,139,250,0.12);
+            padding: 8px 14px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #a78bfa;
+            border-bottom: 1px solid rgba(167,139,250,0.2);
+            letter-spacing: 1px;
+        }
+        .building:hover .bld-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .bld-body {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .bld-label {
+            margin-top: 8px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-align: center;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+        .bld-analogy {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 2px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
+        .bld-sub {
+            font-size: 0.6rem;
+            color: #6b7280;
+            text-align: center;
+            max-width: 160px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            margin-top: 1px;
+        }
+        .bld-tooltip {
+            position: absolute;
+            bottom: calc(100% + 12px);
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            background: rgba(15,17,23,0.95);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            width: 220px;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            z-index: 30;
+            text-align: left;
+        }
+        .bld-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #333;
+        }
+        .bld-tooltip strong { color: #4f8cff; }
+
+        /* ===== SVG BUILDINGS ===== */
+        .house-svg { width: 100px; height: 90px; }
+        .uni-svg { width: 140px; height: 110px; }
+        .office-svg { width: 120px; height: 130px; }
+        .library-svg { width: 110px; height: 90px; }
+        .desk-svg { width: 80px; height: 60px; }
+        .cabinet-svg { width: 60px; height: 80px; }
+        .power-svg { width: 120px; height: 100px; }
+        /* Office popup */
+        .office-popup {
+            position: absolute;
+            top: -10px;
+            left: 140px;
+            width: 320px;
+            height: 220px;
+            background: rgba(12,15,25,0.97);
+            border: 1.5px solid #4f8cff;
+            border-radius: 14px;
+            z-index: 50;
+            opacity: 0;
+            transform: scale(0.9) translateX(-10px);
+            transition: opacity 0.35s, transform 0.35s;
+            pointer-events: none;
+            overflow: hidden;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.7), 0 0 20px rgba(79,140,255,0.15);
+        }
+        .building:hover .office-popup {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+        }
+        .office-popup-header {
+            background: rgba(79,140,255,0.12);
+            padding: 8px 14px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #4f8cff;
+            border-bottom: 1px solid rgba(79,140,255,0.2);
+            letter-spacing: 1px;
+        }
+        .office-popup-label {
+            position: absolute;
+            font-size: 0.55rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 3px;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .factory-svg { width: 130px; height: 100px; }
+
+        /* ===== AGENTS ===== */
+        .agent {
+            position: absolute;
+            z-index: 8;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        .agent svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+
+        @keyframes walkRight {
+            0% { transform: translateX(-60px); }
+            100% { transform: translateX(1400px); }
+        }
+        @keyframes walkLeft {
+            0% { transform: translateX(1400px); }
+            100% { transform: translateX(-60px); }
+        }
+        @keyframes walkDown {
+            0% { transform: translateY(-60px); }
+            100% { transform: translateY(1100px); }
+        }
+        @keyframes walkUp {
+            0% { transform: translateY(1100px); }
+            100% { transform: translateY(-60px); }
+        }
+
+        /* Token coins floating */
+        .token {
+            position: absolute;
+            z-index: 7;
+            animation: floatUp 4s ease-in-out infinite;
+        }
+        @keyframes floatUp {
+            0%, 100% { opacity: 0; transform: translateY(0); }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-40px); }
+        }
+
+        /* Data packets on roads */
+        .packet {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #22d3ee;
+            border-radius: 2px;
+            z-index: 6;
+            box-shadow: 0 0 8px #22d3ee;
+        }
+        @keyframes packetRight {
+            0% { left: 0%; } 100% { left: 100%; }
+        }
+        @keyframes packetDown {
+            0% { top: 0%; } 100% { top: 100%; }
+        }
+
+        /* Lightning bolts for power */
+        .lightning {
+            position: absolute;
+            z-index: 6;
+            animation: zap 2s ease-in-out infinite;
+        }
+        @keyframes zap {
+            0%, 100% { opacity: 0.3; } 50% { opacity: 1; }
+        }
+
+        /* ===== LEGEND ===== */
+        .legend-bar {
+            max-width: 1400px;
+            margin: 30px auto 40px;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .legend-card {
+            background: rgba(26,29,39,0.9);
+            border: 1px solid #2a2d3a;
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .legend-card .lc-icon { font-size: 1.6rem; flex-shrink: 0; }
+        .legend-card .lc-title { font-weight: 700; font-size: 0.82rem; margin-bottom: 2px; }
+        .legend-card .lc-human { font-size: 0.72rem; color: #4f8cff; }
+        .legend-card .lc-semi { font-size: 0.72rem; color: #9ca3af; }
+        .legend-card .lc-scale { font-size: 0.68rem; margin-top: 4px; padding: 2px 8px; border-radius: 4px; display: inline-block; font-weight: 600; }
+        .scale-linear { background: rgba(54,211,153,0.15); color: #36d399; }
+        .scale-super { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .scale-sub { background: rgba(79,140,255,0.15); color: #4f8cff; }
+        .scale-deflation { background: rgba(250,204,21,0.15); color: #facc15; }
+
+        /* Bottleneck */
+        .bottleneck-section {
+            max-width: 1400px;
+            margin: 0 auto 50px;
+            padding: 0 30px;
+        }
+        .bottleneck-section h2 {
+            text-align: center;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            color: #e4e6ed;
+        }
+        .bn-bar {
+            display: flex;
+            gap: 3px;
+            height: 50px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .bn-seg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .bn-seg span { font-size: 0.6rem; font-weight: 400; opacity: 0.8; }
+        .bn-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 0.7rem;
+            color: #6b7280;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #4b5563;
+            font-size: 0.75rem;
+            border-top: 1px solid #1e2235;
+        }
+
+        /* District labels */
+        .district-label {
+            position: absolute;
+            z-index: 4;
+            padding: 4px 14px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>AGENOMICS</h1>
+    <p>The Economy of AI Agents - A Visual Framework</p>
+</div>
+
+<div class="world">
+    <!-- Sky -->
+    <div class="sky">
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const sky = document.querySelector('.sky');
+                for (let i = 0; i < 60; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    const size = Math.random() * 2 + 1;
+                    star.style.width = size + 'px';
+                    star.style.height = size + 'px';
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.animationDelay = Math.random() * 3 + 's';
+                    sky.appendChild(star);
+                }
+            });
+        </script>
+    </div>
+
+    <!-- Map title overlay -->
+    <div style="position:absolute; top:15px; left:50%; transform:translateX(-50%); z-index:10; text-align:center;">
+        <div style="font-size:1rem; font-weight:800; color:rgba(255,255,255,0.6); letter-spacing:3px;">THE AGENT CITY</div>
+        <div style="font-size:0.65rem; color:rgba(255,255,255,0.25); margin-top:2px;">Every building, road, and resource maps to a semiconductor component</div>
+    </div>
+
+    <!-- Ground -->
+    <div class="ground" style="top:430px;"></div>
+
+    <!-- ===== ROADS (Networking / SiPho) ===== -->
+    <!-- Main horizontal road -->
+    <div class="road road-h" style="top:530px;">
+        <div class="road-dash"></div>
+    </div>
+    <!-- Secondary horizontal road -->
+    <div class="road road-h" style="top:720px;">
+        <div class="road-dash"></div>
+    </div>
+    <!-- Vertical road left-center -->
+    <div class="road road-v" style="left:460px; top:430px;">
+        <div class="road-dash-v"></div>
+    </div>
+    <!-- Vertical road right-center -->
+    <div class="road road-v" style="left:920px; top:430px;">
+        <div class="road-dash-v"></div>
+    </div>
+
+    <!-- Data packets on roads -->
+    <div class="packet" style="top:545px; animation: packetRight 6s linear infinite;"></div>
+    <div class="packet" style="top:550px; animation: packetRight 8s linear infinite 2s;"></div>
+    <div class="packet" style="top:735px; animation: packetRight 5s linear infinite 1s;"></div>
+    <div class="packet" style="top:740px; animation: packetRight 7s linear infinite 3s;"></div>
+    <div class="packet" style="left:475px; animation: packetDown 5s linear infinite;"></div>
+    <div class="packet" style="left:935px; animation: packetDown 6s linear infinite 1.5s;"></div>
+
+    <!-- Road label -->
+    <div style="position:absolute; top:760px; left:50%; transform:translateX(-50%); z-index:6; text-align:center;">
+        <div style="font-size:0.85rem; color:#22d3ee; font-weight:800; letter-spacing:2px;">ROADS</div>
+        <div style="font-size:0.7rem; color:#0e9aaa; font-weight:600;">= Networking (NICs, Switches, SiPho)</div>
+        <div style="font-size:0.6rem; color:#6b7280; margin-top:2px;">How agents talk to each other. Scales N&sup2; with population.</div>
+        <div style="font-size:0.55rem; color:#4b5563;">The glowing packets = data flowing between agents</div>
+    </div>
+
+
+    <!-- ===== UNIVERSITY (Foundation Models / LLMs) ===== -->
+    <div class="building" style="top:280px; left:120px;">
+        <div class="bld-body">
+            <svg class="uni-svg" viewBox="0 0 140 110">
+                <!-- Main building -->
+                <rect x="15" y="45" width="110" height="60" rx="3" fill="#2a3f6e" stroke="#4472c4" stroke-width="1.5"/>
+                <!-- Columns -->
+                <rect x="28" y="50" width="8" height="50" fill="#3a5a9e" rx="2"/>
+                <rect x="50" y="50" width="8" height="50" fill="#3a5a9e" rx="2"/>
+                <rect x="72" y="50" width="8" height="50" fill="#3a5a9e" rx="2"/>
+                <rect x="94" y="50" width="8" height="50" fill="#3a5a9e" rx="2"/>
+                <!-- Pediment / triangle -->
+                <polygon points="10,48 70,10 130,48" fill="#1f3864" stroke="#4472c4" stroke-width="1.5"/>
+                <!-- Door -->
+                <rect x="55" y="75" width="20" height="25" rx="2" fill="#facc15" opacity="0.7"/>
+                <!-- Windows with glow -->
+                <rect x="25" y="55" width="14" height="12" rx="1" fill="#facc15" opacity="0.5"/>
+                <rect x="53" y="55" width="14" height="12" rx="1" fill="#facc15" opacity="0.5"/>
+                <rect x="81" y="55" width="14" height="12" rx="1" fill="#facc15" opacity="0.5"/>
+                <!-- Graduation cap icon -->
+                <polygon points="70,15 58,22 70,29 82,22" fill="#a78bfa"/>
+                <line x1="70" y1="22" x2="70" y2="32" stroke="#a78bfa" stroke-width="1.5"/>
+                <!-- GPU chip label -->
+                <rect x="90" y="80" width="26" height="10" rx="2" fill="#7c3aed" stroke="#a78bfa" stroke-width="0.8"/>
+                <text x="103" y="88" text-anchor="middle" fill="#fff" font-size="6" font-weight="bold">GPU</text>
+            </svg>
+
+            <!-- ===== FLOATING UNIVERSITY INTERIOR (appears on hover) ===== -->
+            <div class="uni-popup">
+                <div class="uni-popup-header">INSIDE THE UNIVERSITY — GPU Training Cluster</div>
+                <svg viewBox="0 0 300 195" style="width:300px;height:195px;">
+                    <!-- Floor -->
+                    <rect x="0" y="150" width="300" height="45" fill="#1a1628"/>
+                    <line x1="0" y1="150" x2="300" y2="150" stroke="#2a2040" stroke-width="1"/>
+                    <!-- Back wall -->
+                    <rect x="0" y="15" width="300" height="135" fill="#141028"/>
+
+                    <!-- ===== CHALKBOARD ===== -->
+                    <rect x="30" y="25" width="140" height="70" rx="3" fill="#1a3520" stroke="#538135" stroke-width="1.5"/>
+                    <text x="40" y="42" fill="#e8e8e8" font-size="6" font-weight="600" opacity="0.8">Transformer Architecture</text>
+                    <line x1="40" y1="52" x2="100" y2="52" stroke="#e8e8e8" stroke-width="0.6" opacity="0.5"/>
+                    <!-- Neural network diagram -->
+                    <circle cx="55" cy="62" r="3" fill="none" stroke="#4f8cff" stroke-width="0.8" opacity="0.7"/>
+                    <circle cx="55" cy="72" r="3" fill="none" stroke="#4f8cff" stroke-width="0.8" opacity="0.7"/>
+                    <circle cx="55" cy="82" r="3" fill="none" stroke="#4f8cff" stroke-width="0.8" opacity="0.7"/>
+                    <circle cx="85" cy="58" r="3" fill="none" stroke="#a78bfa" stroke-width="0.8" opacity="0.7"/>
+                    <circle cx="85" cy="68" r="3" fill="none" stroke="#a78bfa" stroke-width="0.8" opacity="0.7"/>
+                    <circle cx="85" cy="78" r="3" fill="none" stroke="#a78bfa" stroke-width="0.8" opacity="0.7"/>
+                    <circle cx="85" cy="88" r="3" fill="none" stroke="#a78bfa" stroke-width="0.8" opacity="0.7"/>
+                    <circle cx="115" cy="65" r="3" fill="none" stroke="#36d399" stroke-width="0.8" opacity="0.7"/>
+                    <circle cx="115" cy="75" r="3" fill="none" stroke="#36d399" stroke-width="0.8" opacity="0.7"/>
+                    <circle cx="115" cy="85" r="3" fill="none" stroke="#36d399" stroke-width="0.8" opacity="0.7"/>
+                    <g stroke="#666" stroke-width="0.4" opacity="0.5">
+                        <line x1="58" y1="62" x2="82" y2="58"/><line x1="58" y1="62" x2="82" y2="68"/><line x1="58" y1="62" x2="82" y2="78"/>
+                        <line x1="58" y1="72" x2="82" y2="58"/><line x1="58" y1="72" x2="82" y2="68"/><line x1="58" y1="72" x2="82" y2="78"/><line x1="58" y1="72" x2="82" y2="88"/>
+                        <line x1="58" y1="82" x2="82" y2="68"/><line x1="58" y1="82" x2="82" y2="78"/><line x1="58" y1="82" x2="82" y2="88"/>
+                        <line x1="88" y1="58" x2="112" y2="65"/><line x1="88" y1="58" x2="112" y2="75"/>
+                        <line x1="88" y1="68" x2="112" y2="65"/><line x1="88" y1="68" x2="112" y2="75"/><line x1="88" y1="68" x2="112" y2="85"/>
+                        <line x1="88" y1="78" x2="112" y2="65"/><line x1="88" y1="78" x2="112" y2="75"/><line x1="88" y1="78" x2="112" y2="85"/>
+                        <line x1="88" y1="88" x2="112" y2="75"/><line x1="88" y1="88" x2="112" y2="85"/>
+                    </g>
+                    <rect x="30" y="95" width="140" height="3" rx="1" fill="#3a3a3a"/>
+                    <rect x="40" y="93" width="8" height="4" rx="1" fill="#e8e8e8" opacity="0.5"/>
+                    <rect x="55" y="93" width="6" height="4" rx="1" fill="#facc15" opacity="0.4"/>
+
+                    <!-- ===== BOOKSHELF WITH TEXTBOOKS ===== -->
+                    <rect x="195" y="25" width="85" height="100" rx="2" fill="#3d2b1a" stroke="#8B6914" stroke-width="1"/>
+                    <rect x="198" y="50" width="79" height="3" fill="#5a3a1a"/>
+                    <rect x="200" y="28" width="8" height="22" rx="1" fill="#ef4444" opacity="0.8"/>
+                    <rect x="209" y="30" width="7" height="20" rx="1" fill="#4f8cff" opacity="0.8"/>
+                    <rect x="217" y="28" width="9" height="22" rx="1" fill="#36d399" opacity="0.8"/>
+                    <rect x="227" y="31" width="6" height="19" rx="1" fill="#facc15" opacity="0.8"/>
+                    <rect x="234" y="28" width="8" height="22" rx="1" fill="#a78bfa" opacity="0.8"/>
+                    <rect x="243" y="30" width="7" height="20" rx="1" fill="#f472b6" opacity="0.7"/>
+                    <rect x="251" y="29" width="9" height="21" rx="1" fill="#22d3ee" opacity="0.7"/>
+                    <rect x="261" y="28" width="7" height="22" rx="1" fill="#ef4444" opacity="0.6"/>
+                    <rect x="198" y="78" width="79" height="3" fill="#5a3a1a"/>
+                    <rect x="200" y="55" width="9" height="23" rx="1" fill="#a78bfa" opacity="0.7"/>
+                    <rect x="210" y="57" width="7" height="21" rx="1" fill="#36d399" opacity="0.7"/>
+                    <rect x="218" y="55" width="8" height="23" rx="1" fill="#facc15" opacity="0.7"/>
+                    <rect x="227" y="56" width="7" height="22" rx="1" fill="#4f8cff" opacity="0.7"/>
+                    <rect x="235" y="55" width="9" height="23" rx="1" fill="#f472b6" opacity="0.6"/>
+                    <rect x="245" y="57" width="6" height="21" rx="1" fill="#ef4444" opacity="0.6"/>
+                    <rect x="252" y="55" width="8" height="23" rx="1" fill="#22d3ee" opacity="0.6"/>
+                    <rect x="261" y="56" width="7" height="22" rx="1" fill="#36d399" opacity="0.5"/>
+                    <rect x="198" y="105" width="79" height="3" fill="#5a3a1a"/>
+                    <rect x="200" y="82" width="7" height="23" rx="1" fill="#22d3ee" opacity="0.6"/>
+                    <rect x="208" y="84" width="8" height="21" rx="1" fill="#ef4444" opacity="0.6"/>
+                    <rect x="217" y="82" width="7" height="23" rx="1" fill="#a78bfa" opacity="0.6"/>
+                    <rect x="225" y="83" width="9" height="22" rx="1" fill="#4f8cff" opacity="0.6"/>
+                    <rect x="235" y="82" width="6" height="23" rx="1" fill="#facc15" opacity="0.5"/>
+                    <rect x="242" y="84" width="8" height="21" rx="1" fill="#36d399" opacity="0.5"/>
+                    <rect x="251" y="82" width="7" height="23" rx="1" fill="#f472b6" opacity="0.5"/>
+                    <rect x="259" y="83" width="8" height="22" rx="1" fill="#ef4444" opacity="0.5"/>
+
+                    <!-- ===== STUDENT AGENTS ===== -->
+                    <circle cx="60" cy="125" r="7" fill="#f59e42"/>
+                    <rect x="55" y="132" width="10" height="8" rx="3" fill="#f59e42"/>
+                    <circle cx="58" cy="124" r="1.2" fill="#fff"/><circle cx="63" cy="124" r="1.2" fill="#fff"/>
+                    <circle cx="58" cy="124" r="0.6" fill="#1a1d27"/><circle cx="63" cy="124" r="0.6" fill="#1a1d27"/>
+                    <rect x="48" y="140" width="28" height="3" rx="1" fill="#5a3a1a"/>
+
+                    <circle cx="110" cy="128" r="7" fill="#4f8cff"/>
+                    <rect x="105" y="135" width="10" height="8" rx="3" fill="#4f8cff"/>
+                    <circle cx="108" cy="127" r="1.2" fill="#fff"/><circle cx="113" cy="127" r="1.2" fill="#fff"/>
+                    <circle cx="108" cy="127" r="0.6" fill="#1a1d27"/><circle cx="113" cy="127" r="0.6" fill="#1a1d27"/>
+                    <rect x="98" y="143" width="28" height="3" rx="1" fill="#5a3a1a"/>
+
+                    <circle cx="160" cy="125" r="7" fill="#36d399"/>
+                    <rect x="155" y="132" width="10" height="8" rx="3" fill="#36d399"/>
+                    <circle cx="158" cy="124" r="1.2" fill="#fff"/><circle cx="163" cy="124" r="1.2" fill="#fff"/>
+                    <circle cx="158" cy="124" r="0.6" fill="#1a1d27"/><circle cx="163" cy="124" r="0.6" fill="#1a1d27"/>
+                    <rect x="148" y="140" width="28" height="3" rx="1" fill="#5a3a1a"/>
+                </svg>
+                <div class="office-popup-label" style="bottom:70px; left:14px; color:#538135; background:rgba(83,129,53,0.15); border:1px solid rgba(83,129,53,0.3);">Model architecture (curriculum)</div>
+                <div class="office-popup-label" style="bottom:70px; right:12px; color:#DAA520; background:rgba(139,105,20,0.2); border:1px solid rgba(218,165,32,0.3);">Textbooks = Training Data (HDD)</div>
+                <div class="office-popup-label" style="bottom:24px; left:50%; transform:translateX(-50%); color:#c4b5fd; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3);">Student agents learning</div>
+            </div>
+        </div>
+        <div class="bld-label" style="color:#a78bfa;">University</div>
+        <div class="bld-analogy" style="color:#c4b5fd;">= GPU Training Cluster</div>
+        <div class="bld-sub">Where agents learn (GPT, Claude, Gemini)<br>Hover to look inside</div>
+    </div>
+
+    <!-- ===== PUBLIC LIBRARY (HDD) — Center-left ===== -->
+    <div class="building" style="top:580px; left:140px;">
+        <div class="bld-body">
+            <svg viewBox="0 0 110 90" style="width:110px;height:90px;">
+                <rect x="10" y="30" width="90" height="55" rx="3" fill="#3d2b1a" stroke="#8B6914" stroke-width="1.5"/>
+                <polygon points="5,32 55,5 105,32" fill="#2a1a0a" stroke="#8B6914" stroke-width="1.5"/>
+                <rect x="20" y="35" width="6" height="45" fill="#5a3a1a" rx="1"/>
+                <rect x="84" y="35" width="6" height="45" fill="#5a3a1a" rx="1"/>
+                <rect x="32" y="40" width="46" height="8" rx="1" fill="#8B6914" opacity="0.4"/>
+                <rect x="34" y="41" width="5" height="6" fill="#ef4444" opacity="0.6"/>
+                <rect x="40" y="41" width="4" height="6" fill="#4f8cff" opacity="0.6"/>
+                <rect x="45" y="41" width="5" height="6" fill="#36d399" opacity="0.6"/>
+                <rect x="51" y="41" width="4" height="6" fill="#facc15" opacity="0.6"/>
+                <rect x="56" y="41" width="5" height="6" fill="#a78bfa" opacity="0.6"/>
+                <rect x="62" y="41" width="4" height="6" fill="#f472b6" opacity="0.6"/>
+                <rect x="67" y="41" width="5" height="6" fill="#22d3ee" opacity="0.6"/>
+                <rect x="32" y="52" width="46" height="8" rx="1" fill="#8B6914" opacity="0.4"/>
+                <rect x="34" y="53" width="4" height="6" fill="#a78bfa" opacity="0.5"/>
+                <rect x="39" y="53" width="5" height="6" fill="#36d399" opacity="0.5"/>
+                <rect x="45" y="53" width="4" height="6" fill="#ef4444" opacity="0.5"/>
+                <rect x="50" y="53" width="5" height="6" fill="#4f8cff" opacity="0.5"/>
+                <rect x="56" y="53" width="4" height="6" fill="#facc15" opacity="0.5"/>
+                <rect x="61" y="53" width="5" height="6" fill="#f472b6" opacity="0.5"/>
+                <rect x="67" y="53" width="5" height="6" fill="#22d3ee" opacity="0.5"/>
+                <rect x="42" y="65" width="16" height="18" rx="2" fill="#facc15" opacity="0.5"/>
+                <text x="55" y="24" text-anchor="middle" fill="#DAA520" font-size="7" font-weight="bold" letter-spacing="2">LIBRARY</text>
+            </svg>
+        </div>
+        <div class="bld-label" style="color:#DAA520;">Public Library</div>
+        <div class="bld-analogy" style="color:#e8c547;">= HDD Storage</div>
+        <div class="bld-sub">Shared bulk knowledge. Vast and cheap,<br>but slow to access.</div>
+        <div class="bld-tooltip">
+            <strong>Library = HDD</strong><br>
+            Cheap, vast storage of shared knowledge. Training datasets, document archives. Like going to a public library — slow to access but has everything.
+        </div>
+    </div>
+
+    <!-- ===== OFFICE TOWER (GPU) — Center, prominent ===== -->
+    <div class="building" style="top:240px; left:640px;">
+        <div class="bld-body">
+            <svg class="office-svg" viewBox="0 0 120 140">
+                <!-- Main tower -->
+                <rect x="20" y="15" width="80" height="120" rx="3" fill="#1a2744" stroke="#4f8cff" stroke-width="1.5"/>
+                <!-- Window grid -->
+                <g fill="#4f8cff" opacity="0.5">
+                    <rect x="30" y="25" width="10" height="8" rx="1"/><rect x="45" y="25" width="10" height="8" rx="1"/><rect x="60" y="25" width="10" height="8" rx="1"/><rect x="75" y="25" width="10" height="8" rx="1"/>
+                    <rect x="30" y="40" width="10" height="8" rx="1"/><rect x="45" y="40" width="10" height="8" rx="1"/><rect x="60" y="40" width="10" height="8" rx="1"/><rect x="75" y="40" width="10" height="8" rx="1"/>
+                    <rect x="30" y="55" width="10" height="8" rx="1"/><rect x="45" y="55" width="10" height="8" rx="1"/><rect x="60" y="55" width="10" height="8" rx="1"/><rect x="75" y="55" width="10" height="8" rx="1"/>
+                    <rect x="30" y="70" width="10" height="8" rx="1"/><rect x="45" y="70" width="10" height="8" rx="1"/><rect x="60" y="70" width="10" height="8" rx="1"/><rect x="75" y="70" width="10" height="8" rx="1"/>
+                    <rect x="30" y="85" width="10" height="8" rx="1"/><rect x="45" y="85" width="10" height="8" rx="1"/><rect x="60" y="85" width="10" height="8" rx="1"/><rect x="75" y="85" width="10" height="8" rx="1"/>
+                    <rect x="30" y="100" width="10" height="8" rx="1"/><rect x="45" y="100" width="10" height="8" rx="1"/><rect x="60" y="100" width="10" height="8" rx="1"/><rect x="75" y="100" width="10" height="8" rx="1"/>
+                </g>
+                <!-- Door -->
+                <rect x="48" y="115" width="24" height="18" rx="2" fill="#facc15" opacity="0.7"/>
+                <!-- GPU chip icon on top -->
+                <rect x="45" y="3" width="30" height="12" rx="2" fill="#7c3aed" stroke="#a78bfa" stroke-width="1"/>
+                <text x="60" y="12" text-anchor="middle" fill="#fff" font-size="7" font-weight="bold">GPU</text>
+                <!-- Antenna -->
+                <line x1="60" y1="0" x2="60" y2="3" stroke="#a78bfa" stroke-width="1.5"/>
+                <circle cx="60" cy="0" r="2" fill="#a78bfa"/>
+            </svg>
+
+            <!-- ===== FLOATING OFFICE ROOM (appears on hover) ===== -->
+            <div class="office-popup">
+                <div class="office-popup-header">INSIDE THE OFFICE — GPU Inference Cluster</div>
+                <svg viewBox="0 0 320 185" style="width:320px;height:185px;">
+                    <!-- Floor -->
+                    <rect x="0" y="140" width="320" height="45" fill="#1a1a2e"/>
+                    <line x1="0" y1="140" x2="320" y2="140" stroke="#333" stroke-width="1"/>
+                    <line x1="40" y1="140" x2="40" y2="185" stroke="#222" stroke-width="0.5"/>
+                    <line x1="80" y1="140" x2="80" y2="185" stroke="#222" stroke-width="0.5"/>
+                    <line x1="120" y1="140" x2="120" y2="185" stroke="#222" stroke-width="0.5"/>
+                    <line x1="160" y1="140" x2="160" y2="185" stroke="#222" stroke-width="0.5"/>
+                    <line x1="200" y1="140" x2="200" y2="185" stroke="#222" stroke-width="0.5"/>
+                    <line x1="240" y1="140" x2="240" y2="185" stroke="#222" stroke-width="0.5"/>
+                    <line x1="280" y1="140" x2="280" y2="185" stroke="#222" stroke-width="0.5"/>
+                    <!-- Back wall -->
+                    <rect x="0" y="15" width="320" height="125" fill="#121828"/>
+                    <!-- Window -->
+                    <rect x="125" y="25" width="70" height="45" rx="2" fill="#0b1628" stroke="#2a3a5a" stroke-width="1"/>
+                    <line x1="160" y1="25" x2="160" y2="70" stroke="#2a3a5a" stroke-width="0.5"/>
+                    <line x1="125" y1="47" x2="195" y2="47" stroke="#2a3a5a" stroke-width="0.5"/>
+                    <circle cx="140" cy="35" r="1" fill="#fff" opacity="0.5"/>
+                    <circle cx="175" cy="42" r="0.8" fill="#fff" opacity="0.4"/>
+                    <circle cx="150" cy="55" r="0.7" fill="#fff" opacity="0.3"/>
+                    <circle cx="185" cy="33" r="1" fill="#fff" opacity="0.6"/>
+
+                    <!-- DESK 1 (HBM/DRAM) -->
+                    <rect x="15" y="105" width="75" height="5" rx="1" fill="#8B6914" stroke="#DAA520" stroke-width="0.8"/>
+                    <rect x="18" y="110" width="3" height="30" fill="#6B4F12"/>
+                    <rect x="84" y="110" width="3" height="30" fill="#6B4F12"/>
+                    <rect x="30" y="80" width="35" height="25" rx="2" fill="#111" stroke="#4f8cff" stroke-width="1"/>
+                    <rect x="32" y="82" width="31" height="19" rx="1" fill="#0a1628"/>
+                    <line x1="34" y1="86" x2="50" y2="86" stroke="#36d399" stroke-width="1" opacity="0.7"/>
+                    <line x1="34" y1="89" x2="55" y2="89" stroke="#4f8cff" stroke-width="1" opacity="0.5"/>
+                    <line x1="34" y1="92" x2="48" y2="92" stroke="#a78bfa" stroke-width="1" opacity="0.6"/>
+                    <line x1="34" y1="95" x2="58" y2="95" stroke="#36d399" stroke-width="1" opacity="0.4"/>
+                    <rect x="44" y="103" width="7" height="4" fill="#333"/>
+                    <rect x="28" y="106" width="28" height="3" rx="1" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+                    <rect x="70" y="99" width="6" height="7" rx="1" fill="#3a2a1a" stroke="#8B6914" stroke-width="0.5"/>
+                    <path d="M 76,101 Q 80,103 76,105" fill="none" stroke="#8B6914" stroke-width="0.5"/>
+
+                    <!-- DESK 2 -->
+                    <rect x="120" y="115" width="65" height="5" rx="1" fill="#8B6914" stroke="#DAA520" stroke-width="0.8"/>
+                    <rect x="123" y="120" width="3" height="20" fill="#6B4F12"/>
+                    <rect x="179" y="120" width="3" height="20" fill="#6B4F12"/>
+                    <rect x="132" y="90" width="35" height="25" rx="2" fill="#111" stroke="#4f8cff" stroke-width="1"/>
+                    <rect x="134" y="92" width="31" height="19" rx="1" fill="#0a1628"/>
+                    <line x1="136" y1="96" x2="155" y2="96" stroke="#facc15" stroke-width="1" opacity="0.6"/>
+                    <line x1="136" y1="99" x2="160" y2="99" stroke="#4f8cff" stroke-width="1" opacity="0.5"/>
+                    <line x1="136" y1="102" x2="150" y2="102" stroke="#f472b6" stroke-width="1" opacity="0.5"/>
+                    <rect x="146" y="113" width="7" height="4" fill="#333"/>
+                    <rect x="130" y="116" width="28" height="3" rx="1" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+
+                    <!-- FILING CABINET (SSD) -->
+                    <rect x="220" y="80" width="30" height="60" rx="2" fill="#4a4a4a" stroke="#777" stroke-width="1"/>
+                    <rect x="223" y="84" width="24" height="12" rx="1" fill="#555" stroke="#666" stroke-width="0.5"/>
+                    <rect x="223" y="100" width="24" height="12" rx="1" fill="#555" stroke="#666" stroke-width="0.5"/>
+                    <rect x="223" y="116" width="24" height="12" rx="1" fill="#555" stroke="#666" stroke-width="0.5"/>
+                    <rect x="231" y="88" width="8" height="2" rx="0.5" fill="#aaa"/>
+                    <rect x="231" y="104" width="8" height="2" rx="0.5" fill="#aaa"/>
+                    <rect x="231" y="120" width="8" height="2" rx="0.5" fill="#aaa"/>
+
+                    <!-- AGENT at desk 1 -->
+                    <circle cx="52" cy="120" r="8" fill="#4f8cff"/>
+                    <rect cx="46" y="128" x="46" width="12" height="10" rx="3" fill="#4f8cff"/>
+                    <circle cx="49" cy="119" r="1.5" fill="#fff"/>
+                    <circle cx="55" cy="119" r="1.5" fill="#fff"/>
+                    <circle cx="49" cy="119" r="0.7" fill="#1a1d27"/>
+                    <circle cx="55" cy="119" r="0.7" fill="#1a1d27"/>
+
+                    <!-- AGENT at desk 2 -->
+                    <circle cx="152" cy="130" r="7" fill="#36d399"/>
+                    <rect x="147" y="137" width="10" height="8" rx="3" fill="#36d399"/>
+                    <circle cx="150" cy="129" r="1.3" fill="#fff"/>
+                    <circle cx="155" cy="129" r="1.3" fill="#fff"/>
+                    <circle cx="150" cy="129" r="0.6" fill="#1a1d27"/>
+                    <circle cx="155" cy="129" r="0.6" fill="#1a1d27"/>
+
+                    <!-- TOOLBOX (APIs / MCP) -->
+                    <rect x="260" y="28" width="45" height="50" rx="2" fill="#1a1020" stroke="#f472b6" stroke-width="0.8" opacity="0.8"/>
+                    <g fill="#333" opacity="0.5">
+                        <circle cx="270" cy="35" r="1"/><circle cx="280" cy="35" r="1"/><circle cx="290" cy="35" r="1"/>
+                        <circle cx="270" cy="45" r="1"/><circle cx="280" cy="45" r="1"/><circle cx="290" cy="45" r="1"/>
+                        <circle cx="270" cy="55" r="1"/><circle cx="280" cy="55" r="1"/><circle cx="290" cy="55" r="1"/>
+                    </g>
+                    <path d="M 266,38 L 275,47" fill="none" stroke="#f472b6" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+                    <circle cx="265" cy="37" r="2.5" fill="none" stroke="#f472b6" stroke-width="1" opacity="0.7"/>
+                    <line x1="280" y1="34" x2="280" y2="48" stroke="#f472b6" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+                    <rect x="276" y="32" width="8" height="4" rx="1" fill="#f472b6" opacity="0.7"/>
+                    <line x1="292" y1="34" x2="292" y2="50" stroke="#f472b6" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+                    <rect x="290" y="32" width="4" height="4" rx="0.5" fill="#f472b6" opacity="0.6"/>
+                    <text x="282" y="68" text-anchor="middle" fill="#f472b6" font-size="5" font-weight="bold" opacity="0.7">API</text>
+                    <text x="282" y="74" text-anchor="middle" fill="#f472b6" font-size="4" opacity="0.5">MCP</text>
+                </svg>
+                <div class="office-popup-label" style="bottom:24px; left:12px; color:#DAA520; background:rgba(139,105,20,0.2); border:1px solid rgba(218,165,32,0.3);">Desk = HBM/DRAM (working memory)</div>
+                <div class="office-popup-label" style="bottom:24px; left:195px; color:#9ca3af; background:rgba(100,100,100,0.2); border:1px solid rgba(150,150,150,0.3);">Cabinet = SSD</div>
+                <div class="office-popup-label" style="bottom:68px; right:8px; color:#f472b6; background:rgba(244,114,182,0.15); border:1px solid rgba(244,114,182,0.3);">Tools = APIs / MCP</div>
+            </div>
+        </div>
+        <div class="bld-label" style="color:#a78bfa;">Office</div>
+        <div class="bld-analogy" style="color:#c4b5fd;">= GPU Inference Cluster</div>
+        <div class="bld-sub">Where agents go to work and think.<br>Hover to look inside</div>
+    </div>
+
+    <!-- ===== SALARY = TOKENS (flowing INTO office from left) ===== -->
+    <div style="position:absolute; top:260px; left:480px; z-index:7;">
+        <svg width="170" height="130" viewBox="0 0 170 130">
+            <path d="M 10,50 C 50,50 80,60 155,60" fill="none" stroke="#d97706" stroke-width="1.5" opacity="0.3" stroke-dasharray="6,4">
+                <animate attributeName="stroke-dashoffset" values="0;-20" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+            <path d="M 20,70 C 60,70 90,75 155,75" fill="none" stroke="#d97706" stroke-width="1" opacity="0.25" stroke-dasharray="6,4">
+                <animate attributeName="stroke-dashoffset" values="0;-20" dur="2s" repeatCount="indefinite"/>
+            </path>
+            <path d="M 5,90 C 50,90 90,88 155,88" fill="none" stroke="#d97706" stroke-width="1" opacity="0.2" stroke-dasharray="6,4">
+                <animate attributeName="stroke-dashoffset" values="0;-20" dur="2.5s" repeatCount="indefinite"/>
+            </path>
+            <g>
+                <circle cx="30" cy="50" r="8" fill="#facc15" stroke="#d97706" stroke-width="1.2" opacity="0.7">
+                    <animate attributeName="cx" values="10;155" dur="3s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.8;0.2" dur="3s" repeatCount="indefinite"/>
+                </circle>
+                <text x="30" y="54" text-anchor="middle" fill="#92400e" font-size="8" font-weight="bold">
+                    T
+                    <animate attributeName="x" values="10;155" dur="3s" repeatCount="indefinite"/>
+                </text>
+            </g>
+            <g>
+                <circle cx="50" cy="70" r="7" fill="#facc15" stroke="#d97706" stroke-width="1" opacity="0.6">
+                    <animate attributeName="cx" values="20;155" dur="3.5s" repeatCount="indefinite" begin="1s"/>
+                    <animate attributeName="opacity" values="0.7;0.15" dur="3.5s" repeatCount="indefinite" begin="1s"/>
+                </circle>
+                <text x="50" y="74" text-anchor="middle" fill="#92400e" font-size="7" font-weight="bold">
+                    T
+                    <animate attributeName="x" values="20;155" dur="3.5s" repeatCount="indefinite" begin="1s"/>
+                </text>
+            </g>
+            <g>
+                <circle cx="40" cy="90" r="6" fill="#facc15" stroke="#d97706" stroke-width="1" opacity="0.5">
+                    <animate attributeName="cx" values="5;155" dur="4s" repeatCount="indefinite" begin="2s"/>
+                    <animate attributeName="opacity" values="0.6;0.1" dur="4s" repeatCount="indefinite" begin="2s"/>
+                </circle>
+                <text x="40" y="93" text-anchor="middle" fill="#92400e" font-size="6" font-weight="bold">
+                    T
+                    <animate attributeName="x" values="5;155" dur="4s" repeatCount="indefinite" begin="2s"/>
+                </text>
+            </g>
+        </svg>
+    </div>
+    <!-- Salary = Tokens label -->
+    <div style="position:absolute; top:258px; left:440px; z-index:8; text-align:right; width:140px;">
+        <div style="font-size:0.95rem; font-weight:900; color:#facc15; text-shadow: 0 0 12px rgba(250,204,21,0.3); letter-spacing:1px;">TOKENS IN</div>
+        <div style="font-size:0.95rem; color:#d97706; font-weight:900; margin-top:3px; letter-spacing:1px;">= SALARY</div>
+        <div style="font-size:0.55rem; color:#92400e; margin-top:2px;">What you pay agents to work.</div>
+        <div style="font-size:0.55rem; color:#92400e;">Cost keeps dropping (deflationary).</div>
+    </div>
+
+    <!-- ===== GDP OUTPUT (flowing out of office to the right) ===== -->
+    <div style="position:absolute; top:280px; left:770px; z-index:7;">
+        <svg width="200" height="120" viewBox="0 0 200 120">
+            <path d="M 0,60 C 30,60 40,40 70,40 L 140,40" fill="none" stroke="#facc15" stroke-width="2" opacity="0.4" stroke-dasharray="6,4">
+                <animate attributeName="stroke-dashoffset" values="20;0" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+            <path d="M 0,70 C 30,70 40,60 70,60 L 140,60" fill="none" stroke="#facc15" stroke-width="1.5" opacity="0.3" stroke-dasharray="6,4">
+                <animate attributeName="stroke-dashoffset" values="20;0" dur="2s" repeatCount="indefinite"/>
+            </path>
+            <path d="M 0,80 C 30,80 40,80 70,80 L 140,80" fill="none" stroke="#facc15" stroke-width="1" opacity="0.2" stroke-dasharray="6,4">
+                <animate attributeName="stroke-dashoffset" values="20;0" dur="2.5s" repeatCount="indefinite"/>
+            </path>
+            <polygon points="138,33 150,40 138,47" fill="#facc15" opacity="0.5"/>
+            <polygon points="138,53 150,60 138,67" fill="#facc15" opacity="0.4"/>
+            <polygon points="138,73 150,80 138,87" fill="#facc15" opacity="0.3"/>
+            <rect x="80" y="34" width="14" height="12" rx="2" fill="#facc15" opacity="0.5">
+                <animate attributeName="x" values="20;140" dur="3s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.6;0.1" dur="3s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="50" y="54" width="12" height="10" rx="2" fill="#facc15" opacity="0.4">
+                <animate attributeName="x" values="10;140" dur="4s" repeatCount="indefinite" begin="0.8s"/>
+                <animate attributeName="opacity" values="0.5;0.1" dur="4s" repeatCount="indefinite" begin="0.8s"/>
+            </rect>
+            <rect x="60" y="74" width="10" height="10" rx="2" fill="#facc15" opacity="0.3">
+                <animate attributeName="x" values="15;140" dur="3.5s" repeatCount="indefinite" begin="1.5s"/>
+                <animate attributeName="opacity" values="0.4;0.1" dur="3.5s" repeatCount="indefinite" begin="1.5s"/>
+            </rect>
+        </svg>
+    </div>
+    <!-- Output = GDP label -->
+    <div style="position:absolute; top:258px; left:940px; z-index:8; text-align:left; width:140px;">
+        <div style="font-size:0.95rem; font-weight:900; color:#facc15; text-shadow: 0 0 12px rgba(250,204,21,0.3); letter-spacing:1px;">OUTPUT</div>
+        <div style="font-size:0.95rem; color:#d97706; font-weight:900; margin-top:3px; letter-spacing:1px;">= GDP</div>
+        <div style="font-size:0.55rem; color:#92400e; margin-top:2px;">Tasks completed, code written,</div>
+        <div style="font-size:0.55rem; color:#92400e;">decisions made, analyses run.</div>
+    </div>
+
+    <!-- ===== HOUSES (CPU) — Right side, residential ===== -->
+    <div class="building" style="top:590px; left:1020px;">
+        <div class="bld-body">
+            <svg class="house-svg" viewBox="0 0 100 90">
+                <rect x="15" y="40" width="70" height="45" rx="2" fill="#2d4a2d" stroke="#538135" stroke-width="1.5"/>
+                <polygon points="10,42 50,10 90,42" fill="#1a3520" stroke="#538135" stroke-width="1.5"/>
+                <rect x="38" y="55" width="18" height="28" rx="2" fill="#facc15" opacity="0.6"/>
+                <rect x="22" y="50" width="12" height="12" rx="1" fill="#4f8cff" opacity="0.5"/>
+                <rect x="62" y="50" width="12" height="12" rx="1" fill="#4f8cff" opacity="0.5"/>
+                <rect x="65" y="15" width="10" height="20" fill="#3a3a3a"/>
+                <rect x="42" y="62" width="10" height="10" rx="1" fill="none" stroke="#facc15" stroke-width="1"/>
+                <line x1="42" y1="65" x2="39" y2="65" stroke="#facc15" stroke-width="0.8"/>
+                <line x1="42" y1="69" x2="39" y2="69" stroke="#facc15" stroke-width="0.8"/>
+                <line x1="52" y1="65" x2="55" y2="65" stroke="#facc15" stroke-width="0.8"/>
+                <line x1="52" y1="69" x2="55" y2="69" stroke="#facc15" stroke-width="0.8"/>
+            </svg>
+        </div>
+        <div class="bld-label" style="color:#538135;">Houses</div>
+        <div class="bld-analogy" style="color:#7bc96f;">= CPU Cores</div>
+        <div class="bld-sub">Every agent needs a house to exist.<br>No CPU = agent is dead.</div>
+        <div class="bld-tooltip">
+            <strong>House = CPU</strong><br>
+            Every agent needs a persistent CPU process to exist. Like a heartbeat. No CPU = the agent is dead. Scales linearly with population.
+        </div>
+    </div>
+
+    <!-- Second house -->
+    <div class="building" style="top:610px; left:1170px;">
+        <div class="bld-body">
+            <svg class="house-svg" viewBox="0 0 100 90" style="width:80px;height:72px;">
+                <rect x="15" y="40" width="70" height="45" rx="2" fill="#2d4a2d" stroke="#538135" stroke-width="1.5"/>
+                <polygon points="10,42 50,10 90,42" fill="#1a3520" stroke="#538135" stroke-width="1.5"/>
+                <rect x="38" y="55" width="18" height="28" rx="2" fill="#facc15" opacity="0.5"/>
+                <rect x="22" y="50" width="12" height="12" rx="1" fill="#4f8cff" opacity="0.4"/>
+                <rect x="62" y="50" width="12" height="12" rx="1" fill="#4f8cff" opacity="0.4"/>
+            </svg>
+        </div>
+    </div>
+    <!-- Third house -->
+    <div class="building" style="top:625px; left:1280px;">
+        <div class="bld-body">
+            <svg class="house-svg" viewBox="0 0 100 90" style="width:70px;height:63px;">
+                <rect x="15" y="40" width="70" height="45" rx="2" fill="#2d4a2d" stroke="#538135" stroke-width="1.5"/>
+                <polygon points="10,42 50,10 90,42" fill="#1a3520" stroke="#538135" stroke-width="1.5"/>
+                <rect x="38" y="55" width="18" height="28" rx="2" fill="#facc15" opacity="0.4"/>
+                <rect x="22" y="50" width="12" height="12" rx="1" fill="#4f8cff" opacity="0.3"/>
+                <rect x="62" y="50" width="12" height="12" rx="1" fill="#4f8cff" opacity="0.3"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- ===== POWER PLANT / FARM (Electricity) — Bottom left ===== -->
+    <div class="building" style="top:820px; left:100px;">
+        <div class="bld-body">
+            <svg class="power-svg" viewBox="0 0 130 100">
+                <rect x="0" y="70" width="130" height="30" rx="2" fill="#1a3520"/>
+                <line x1="5" y1="78" x2="125" y2="78" stroke="#2d5a2d" stroke-width="1.5"/>
+                <line x1="5" y1="85" x2="125" y2="85" stroke="#2d5a2d" stroke-width="1.5"/>
+                <line x1="5" y1="92" x2="125" y2="92" stroke="#2d5a2d" stroke-width="1.5"/>
+                <g stroke="#facc15" stroke-width="1.2" stroke-linecap="round" opacity="0.7">
+                    <line x1="15" y1="78" x2="15" y2="68"/><line x1="12" y1="70" x2="15" y2="68"/><line x1="18" y1="70" x2="15" y2="68"/>
+                    <line x1="30" y1="78" x2="30" y2="66"/><line x1="27" y1="68" x2="30" y2="66"/><line x1="33" y1="68" x2="30" y2="66"/>
+                    <line x1="45" y1="78" x2="45" y2="69"/><line x1="42" y1="71" x2="45" y2="69"/><line x1="48" y1="71" x2="45" y2="69"/>
+                    <line x1="60" y1="78" x2="60" y2="67"/><line x1="57" y1="69" x2="60" y2="67"/><line x1="63" y1="69" x2="60" y2="67"/>
+                    <line x1="75" y1="78" x2="75" y2="70"/><line x1="72" y1="72" x2="75" y2="70"/><line x1="78" y1="72" x2="75" y2="70"/>
+                    <line x1="90" y1="78" x2="90" y2="66"/><line x1="87" y1="68" x2="90" y2="66"/><line x1="93" y1="68" x2="90" y2="66"/>
+                    <line x1="105" y1="78" x2="105" y2="69"/><line x1="102" y1="71" x2="105" y2="69"/><line x1="108" y1="71" x2="105" y2="69"/>
+                </g>
+                <rect x="30" y="30" width="50" height="40" rx="2" fill="#6b2020" stroke="#ef4444" stroke-width="1"/>
+                <polygon points="25,32 55,8 85,32" fill="#4a1515" stroke="#ef4444" stroke-width="1"/>
+                <rect x="45" y="45" width="18" height="23" rx="2" fill="#3a1010" stroke="#8b3030" stroke-width="0.8"/>
+                <line x1="54" y1="45" x2="54" y2="68" stroke="#8b3030" stroke-width="0.5"/>
+                <rect x="35" y="40" width="8" height="8" rx="1" fill="#facc15" opacity="0.4"/>
+                <rect x="67" y="40" width="8" height="8" rx="1" fill="#facc15" opacity="0.4"/>
+                <rect x="92" y="20" width="18" height="50" rx="9" fill="#555" stroke="#888" stroke-width="1"/>
+                <ellipse cx="101" cy="20" rx="9" ry="4" fill="#666" stroke="#888" stroke-width="0.8"/>
+                <polygon points="55,12 58,20 56,20 59,28 53,19 55.5,19" fill="#facc15" opacity="0.9"/>
+                <circle cx="15" cy="15" r="10" fill="#facc15" opacity="0.25"/>
+                <circle cx="15" cy="15" r="6" fill="#facc15" opacity="0.4"/>
+            </svg>
+        </div>
+        <div class="bld-label" style="color:#ef4444;">Farm</div>
+        <div class="bld-analogy" style="color:#f87171;">= Electricity (Food for Agents)</div>
+        <div class="bld-sub">Every house, office, and road needs power.<br>The ultimate constraint.</div>
+        <div class="bld-tooltip">
+            <strong>Electricity = Food</strong><br>
+            Just as humans need calories to survive and work, agents need electricity. Every house (CPU), every office (GPU), every road (network) consumes it. The ultimate physical constraint.
+        </div>
+    </div>
+
+    <!-- Power lines from farm to buildings -->
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:3;pointer-events:none;">
+        <!-- Power line to university -->
+        <line x1="160" y1="830" x2="190" y2="420" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+        <!-- Power line to office -->
+        <line x1="220" y1="830" x2="700" y2="420" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+        <!-- Power line to residential -->
+        <line x1="220" y1="850" x2="1070" y2="620" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+        <!-- Power line to library -->
+        <line x1="160" y1="830" x2="200" y2="700" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+    </svg>
+
+    <!-- Agent commute annotation -->
+    <div style="position:absolute; top:505px; left:660px; z-index:6; text-align:center;">
+        <div style="font-size:0.55rem; color:rgba(255,255,255,0.3); font-style:italic;">Agents commuting between home and office</div>
+        <div style="font-size:0.5rem; color:rgba(255,255,255,0.2);">(Latency = commute time)</div>
+    </div>
+
+    <!-- ===== WALKING AGENTS ===== -->
+    <!-- Agent walking on upper road -->
+    <div class="agent" style="top:520px; animation: walkRight 18s linear infinite;">
+        <svg width="28" height="36" viewBox="0 0 28 36">
+            <circle cx="14" cy="8" r="7" fill="#4f8cff"/>
+            <rect x="8" y="15" width="12" height="14" rx="3" fill="#4f8cff"/>
+            <circle cx="11" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="17" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="11" cy="7" r="0.8" fill="#1a1d27"/>
+            <circle cx="17" cy="7" r="0.8" fill="#1a1d27"/>
+            <line x1="10" y1="29" x2="8" y2="35" stroke="#4f8cff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="18" y1="29" x2="20" y2="35" stroke="#4f8cff" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <!-- Agent walking left on upper road -->
+    <div class="agent" style="top:523px; animation: walkLeft 22s linear infinite;">
+        <svg width="28" height="36" viewBox="0 0 28 36">
+            <circle cx="14" cy="8" r="7" fill="#36d399"/>
+            <rect x="8" y="15" width="12" height="14" rx="3" fill="#36d399"/>
+            <circle cx="11" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="17" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="11" cy="7" r="0.8" fill="#1a1d27"/>
+            <circle cx="17" cy="7" r="0.8" fill="#1a1d27"/>
+            <line x1="10" y1="29" x2="8" y2="35" stroke="#36d399" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="18" y1="29" x2="20" y2="35" stroke="#36d399" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <!-- Agent walking on lower road -->
+    <div class="agent" style="top:710px; animation: walkRight 15s linear infinite 3s;">
+        <svg width="24" height="30" viewBox="0 0 28 36">
+            <circle cx="14" cy="8" r="7" fill="#a78bfa"/>
+            <rect x="8" y="15" width="12" height="14" rx="3" fill="#a78bfa"/>
+            <circle cx="11" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="17" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="11" cy="7" r="0.8" fill="#1a1d27"/>
+            <circle cx="17" cy="7" r="0.8" fill="#1a1d27"/>
+            <line x1="10" y1="29" x2="8" y2="35" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="18" y1="29" x2="20" y2="35" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <!-- Agent on left vertical road -->
+    <div class="agent" style="left:455px; animation: walkDown 20s linear infinite 2s;">
+        <svg width="24" height="30" viewBox="0 0 28 36">
+            <circle cx="14" cy="8" r="7" fill="#f59e42"/>
+            <rect x="8" y="15" width="12" height="14" rx="3" fill="#f59e42"/>
+            <circle cx="11" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="17" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="11" cy="7" r="0.8" fill="#1a1d27"/>
+            <circle cx="17" cy="7" r="0.8" fill="#1a1d27"/>
+            <line x1="10" y1="29" x2="8" y2="35" stroke="#f59e42" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="18" y1="29" x2="20" y2="35" stroke="#f59e42" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <!-- Agent on right vertical road -->
+    <div class="agent" style="left:915px; animation: walkUp 25s linear infinite;">
+        <svg width="24" height="30" viewBox="0 0 28 36">
+            <circle cx="14" cy="8" r="7" fill="#ef4444"/>
+            <rect x="8" y="15" width="12" height="14" rx="3" fill="#ef4444"/>
+            <circle cx="11" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="17" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="11" cy="7" r="0.8" fill="#1a1d27"/>
+            <circle cx="17" cy="7" r="0.8" fill="#1a1d27"/>
+            <line x1="10" y1="29" x2="8" y2="35" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="18" y1="29" x2="20" y2="35" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <!-- Agent walking left on lower road -->
+    <div class="agent" style="top:713px; animation: walkLeft 20s linear infinite 5s;">
+        <svg width="24" height="30" viewBox="0 0 28 36">
+            <circle cx="14" cy="8" r="7" fill="#f472b6"/>
+            <rect x="8" y="15" width="12" height="14" rx="3" fill="#f472b6"/>
+            <circle cx="11" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="17" cy="7" r="1.5" fill="#fff"/>
+            <circle cx="11" cy="7" r="0.8" fill="#1a1d27"/>
+            <circle cx="17" cy="7" r="0.8" fill="#1a1d27"/>
+            <line x1="10" y1="29" x2="8" y2="35" stroke="#f472b6" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="18" y1="29" x2="20" y2="35" stroke="#f472b6" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <!-- ===== RESIDENTIAL SIGN ===== -->
+    <div style="position:absolute; top:570px; left:1020px; z-index:6;">
+        <svg viewBox="0 0 130 60" style="width:130px;height:60px;">
+            <rect x="60" y="35" width="4" height="25" fill="#666"/>
+            <rect x="5" y="3" width="115" height="34" rx="5" fill="#1a3520" stroke="#538135" stroke-width="1.5"/>
+            <text x="62" y="17" text-anchor="middle" fill="#7bc96f" font-size="8" font-weight="bold">RESIDENTIAL</text>
+            <text x="62" y="30" text-anchor="middle" fill="#538135" font-size="6.5">Where agents live (CPU)</text>
+        </svg>
+    </div>
+
+</div>
+
+<!-- ===== LEGEND CARDS ===== -->
+<div class="legend-bar">
+    <div class="legend-card">
+        <div class="lc-icon">🏠</div>
+        <div>
+            <div class="lc-title">House = CPU</div>
+            <div class="lc-human">Where agents exist/persist</div>
+            <div class="lc-semi">CPU cores, containers</div>
+            <div class="lc-scale scale-linear">Linear scaling</div>
+        </div>
+    </div>
+    <div class="legend-card">
+        <div class="lc-icon">🏢</div>
+        <div>
+            <div class="lc-title">Office = GPU Inference</div>
+            <div class="lc-human">Where agents work (inference cluster)</div>
+            <div class="lc-semi">GPU inference (NVIDIA)</div>
+            <div class="lc-scale scale-sub">Sub-linear (shared)</div>
+        </div>
+    </div>
+    <div class="legend-card">
+        <div class="lc-icon">🎓</div>
+        <div>
+            <div class="lc-title">University = GPU Training</div>
+            <div class="lc-human">Training cluster (foundation models)</div>
+            <div class="lc-semi">OpenAI, Anthropic, Google</div>
+        </div>
+    </div>
+    <div class="legend-card">
+        <div class="lc-icon">💰</div>
+        <div>
+            <div class="lc-title">Salary = Tokens</div>
+            <div class="lc-human">Cost per task/inference</div>
+            <div class="lc-semi">Compute cost</div>
+            <div class="lc-scale scale-deflation">Deflationary</div>
+        </div>
+    </div>
+    <div class="legend-card">
+        <div class="lc-icon">🪑</div>
+        <div>
+            <div class="lc-title">Desk = HBM/DRAM</div>
+            <div class="lc-human">Working memory / context</div>
+            <div class="lc-semi">SK Hynix, Samsung, Micron</div>
+            <div class="lc-scale scale-linear">Linear scaling</div>
+        </div>
+    </div>
+    <div class="legend-card">
+        <div class="lc-icon">🗄️</div>
+        <div>
+            <div class="lc-title">Cabinet = SSD</div>
+            <div class="lc-human">Personal stored knowledge</div>
+            <div class="lc-semi">NAND (Samsung, WDC)</div>
+            <div class="lc-scale scale-linear">Linear (cheap)</div>
+        </div>
+    </div>
+    <div class="legend-card">
+        <div class="lc-icon">🏛️</div>
+        <div>
+            <div class="lc-title">Library = HDD</div>
+            <div class="lc-human">Shared bulk knowledge</div>
+            <div class="lc-semi">HDD (WDC, Seagate)</div>
+            <div class="lc-scale scale-sub">Sub-linear (shared)</div>
+        </div>
+    </div>
+    <div class="legend-card">
+        <div class="lc-icon">🛣️</div>
+        <div>
+            <div class="lc-title">Roads = Networking</div>
+            <div class="lc-human">Agent-to-agent communication</div>
+            <div class="lc-semi">Tower Semi SiPho, Broadcom</div>
+            <div class="lc-scale scale-super">N² super-linear!</div>
+        </div>
+    </div>
+    <div class="legend-card">
+        <div class="lc-icon">🌾</div>
+        <div>
+            <div class="lc-title">Electricity = Food</div>
+            <div class="lc-human">Energy that keeps agents alive</div>
+            <div class="lc-semi">Utilities, nuclear, grid</div>
+            <div class="lc-scale scale-linear">Linear scaling</div>
+        </div>
+    </div>
+    <div class="legend-card">
+        <div class="lc-icon">🔧</div>
+        <div>
+            <div class="lc-title">Tools = APIs</div>
+            <div class="lc-human">Function calling / MCP</div>
+            <div class="lc-semi">Software layer</div>
+        </div>
+    </div>
+    <div class="legend-card">
+        <div class="lc-icon">📊</div>
+        <div>
+            <div class="lc-title">GDP = Output</div>
+            <div class="lc-human">Flows out of the office (inference)</div>
+            <div class="lc-semi">Tasks, code, decisions, analyses</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== BOTTLENECK ===== -->
+<div class="bottleneck-section">
+    <h2>Bottleneck Hierarchy — What Breaks First as Agent Population Scales?</h2>
+    <div class="bn-bar">
+        <div class="bn-seg" style="flex-grow:6; background: linear-gradient(135deg, #7c3aed, #a78bfa);">GPU<br><span>Offices</span></div>
+        <div class="bn-seg" style="flex-grow:5; background: linear-gradient(135deg, #0891b2, #22d3ee);">Networking<br><span>Roads (N²)</span></div>
+        <div class="bn-seg" style="flex-grow:4.5; background: linear-gradient(135deg, #059669, #36d399);">HBM/DRAM<br><span>Desks</span></div>
+        <div class="bn-seg" style="flex-grow:3.5; background: linear-gradient(135deg, #2563eb, #4f8cff);">CPU<br><span>Houses</span></div>
+        <div class="bn-seg" style="flex-grow:3; background: linear-gradient(135deg, #dc2626, #ef4444);">Power<br><span>Food</span></div>
+        <div class="bn-seg" style="flex-grow:1.5; background: linear-gradient(135deg, #4b5563, #6b7280);">Storage<br><span>Filing</span></div>
+    </div>
+    <div class="bn-labels">
+        <span>Most constrained today</span>
+        <span>Least constrained</span>
+    </div>
+</div>
+
+<footer>
+    Agenomics — The Economy of AI Agents | Internal Use Only | March 2026
+</footer>
+
+</body>
+</html>
