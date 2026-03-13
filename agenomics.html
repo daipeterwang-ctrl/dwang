@@ -130,8 +130,8 @@
             position: absolute;
             top: -20px;
             left: 155px;
-            width: 300px;
-            height: 230px;
+            width: 380px;
+            height: 310px;
             background: rgba(12,15,25,0.97);
             border: 1.5px solid #a78bfa;
             border-radius: 14px;
@@ -233,8 +233,8 @@
             position: absolute;
             top: -10px;
             left: 140px;
-            width: 320px;
-            height: 220px;
+            width: 400px;
+            height: 310px;
             background: rgba(12,15,25,0.97);
             border: 1.5px solid #4f8cff;
             border-radius: 14px;
@@ -288,12 +288,12 @@
             100% { transform: translateX(-60px); }
         }
         @keyframes walkDown {
-            0% { transform: translateY(-60px); }
-            100% { transform: translateY(1100px); }
+            0% { transform: translateY(430px); }
+            100% { transform: translateY(1050px); }
         }
         @keyframes walkUp {
-            0% { transform: translateY(1100px); }
-            100% { transform: translateY(-60px); }
+            0% { transform: translateY(1050px); }
+            100% { transform: translateY(430px); }
         }
 
         /* Token coins floating */
@@ -323,7 +323,7 @@
             0% { left: 0%; } 100% { left: 100%; }
         }
         @keyframes packetDown {
-            0% { top: 0%; } 100% { top: 100%; }
+            0% { top: 430px; } 100% { top: 1050px; }
         }
 
         /* Lightning bolts for power */
@@ -454,7 +454,7 @@
     <!-- Map title overlay -->
     <div style="position:absolute; top:15px; left:50%; transform:translateX(-50%); z-index:10; text-align:center;">
         <div style="font-size:1rem; font-weight:800; color:rgba(255,255,255,0.6); letter-spacing:3px;">THE AGENT CITY</div>
-        <div style="font-size:0.65rem; color:rgba(255,255,255,0.25); margin-top:2px;">Every building, road, and resource maps to a semiconductor component</div>
+        <div style="font-size:0.75rem; color:rgba(255,255,255,0.4); margin-top:2px;">Every building, road, and resource maps to a semiconductor component</div>
     </div>
 
     <!-- Ground -->
@@ -487,16 +487,16 @@
     <div class="packet" style="left:845px; animation: packetDown 6s linear infinite 1.5s;"></div>
 
     <!-- Road label -->
-    <div style="position:absolute; top:760px; left:50%; transform:translateX(-50%); z-index:6; text-align:center;">
+    <div style="position:absolute; top:780px; left:630px; transform:translateX(-50%); z-index:6; text-align:center;">
         <div style="font-size:0.85rem; color:#22d3ee; font-weight:800; letter-spacing:2px;">ROADS</div>
         <div style="font-size:0.7rem; color:#0e9aaa; font-weight:600;">= Networking (NICs, Switches, SiPho)</div>
-        <div style="font-size:0.6rem; color:#6b7280; margin-top:2px;">How agents talk to each other. Scales N&sup2; with population.</div>
-        <div style="font-size:0.55rem; color:#4b5563;">The glowing packets = data flowing between agents</div>
+        <div style="font-size:0.75rem; color:#9ca3af; margin-top:2px;">How agents talk to each other. Scales N&sup2; with population.</div>
+        <div style="font-size:0.7rem; color:#6b7280;">The glowing packets = data flowing between agents</div>
     </div>
 
 
     <!-- ===== UNIVERSITY (Foundation Models / LLMs) — Row 1 center ===== -->
-    <div class="building" style="top:280px; left:520px;">
+    <div class="building" style="top:350px; left:560px;">
         <div class="bld-body">
             <svg class="uni-svg" viewBox="0 0 140 110">
                 <!-- Main building -->
@@ -524,8 +524,8 @@
 
             <!-- ===== FLOATING UNIVERSITY INTERIOR (appears on hover) ===== -->
             <div class="uni-popup">
-                <div class="uni-popup-header">INSIDE THE UNIVERSITY — GPU Training Cluster</div>
-                <svg viewBox="0 0 300 195" style="width:300px;height:195px;">
+                <div class="uni-popup-header">INSIDE THE UNIVERSITY — GPU Training Cluster<br><span style="font-weight:400; font-size:0.6rem; color:#c4b5fd; letter-spacing:0;">Where agents learn (GPT, Claude, Gemini)</span></div>
+                <svg viewBox="0 0 300 195" style="width:380px;height:248px;">
                     <!-- Floor -->
                     <rect x="0" y="150" width="300" height="45" fill="#1a1628"/>
                     <line x1="0" y1="150" x2="300" y2="150" stroke="#2a2040" stroke-width="1"/>
@@ -609,14 +609,13 @@
                     <circle cx="158" cy="124" r="0.6" fill="#1a1d27"/><circle cx="163" cy="124" r="0.6" fill="#1a1d27"/>
                     <rect x="148" y="140" width="28" height="3" rx="1" fill="#5a3a1a"/>
                 </svg>
-                <div class="office-popup-label" style="bottom:70px; left:14px; color:#538135; background:rgba(83,129,53,0.15); border:1px solid rgba(83,129,53,0.3);">Model architecture (curriculum)</div>
-                <div class="office-popup-label" style="bottom:70px; right:12px; color:#DAA520; background:rgba(139,105,20,0.2); border:1px solid rgba(218,165,32,0.3);">Textbooks = Training Data (HDD)</div>
-                <div class="office-popup-label" style="bottom:24px; left:50%; transform:translateX(-50%); color:#c4b5fd; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3);">Student agents learning</div>
+                <div class="office-popup-label" style="bottom:50px; left:14px; color:#538135; background:rgba(83,129,53,0.15); border:1px solid rgba(83,129,53,0.3);">Model architecture (curriculum)</div>
+                <div class="office-popup-label" style="bottom:50px; right:12px; color:#DAA520; background:rgba(139,105,20,0.2); border:1px solid rgba(218,165,32,0.3);">Textbooks = Training Data (HDD)</div>
+                <div class="office-popup-label" style="bottom:30px; left:14px; color:#c4b5fd; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3);">Student agents learning</div>
             </div>
         </div>
         <div class="bld-label" style="color:#a78bfa;">University</div>
         <div class="bld-analogy" style="color:#c4b5fd;">= GPU Training Cluster</div>
-        <div class="bld-sub">Where agents learn (GPT, Claude, Gemini)<br>Hover to look inside</div>
     </div>
 
     <!-- ===== PUBLIC LIBRARY (HDD) — Row 2 left ===== -->
@@ -649,7 +648,6 @@
         </div>
         <div class="bld-label" style="color:#DAA520;">Public Library</div>
         <div class="bld-analogy" style="color:#e8c547;">= HDD Storage</div>
-        <div class="bld-sub">Shared bulk knowledge. Vast and cheap,<br>but slow to access.</div>
         <div class="bld-tooltip">
             <strong>Library = HDD</strong><br>
             Cheap, vast storage of shared knowledge. Training datasets, document archives. Like going to a public library — slow to access but has everything.
@@ -657,7 +655,7 @@
     </div>
 
     <!-- ===== OFFICE TOWER (GPU) — Row 1 right ===== -->
-    <div class="building" style="top:240px; left:1000px;">
+    <div class="building" style="top:330px; left:1000px;">
         <div class="bld-body">
             <svg class="office-svg" viewBox="0 0 120 140">
                 <!-- Main tower -->
@@ -683,8 +681,8 @@
 
             <!-- ===== FLOATING OFFICE ROOM (appears on hover) ===== -->
             <div class="office-popup">
-                <div class="office-popup-header">INSIDE THE OFFICE — GPU Inference Cluster</div>
-                <svg viewBox="0 0 320 185" style="width:320px;height:185px;">
+                <div class="office-popup-header">INSIDE THE OFFICE — GPU Inference Cluster<br><span style="font-weight:400; font-size:0.6rem; color:#93b4ff; letter-spacing:0;">Where agents go to work and think</span></div>
+                <svg viewBox="0 0 320 185" style="width:400px;height:232px;">
                     <!-- Floor -->
                     <rect x="0" y="140" width="320" height="45" fill="#1a1a2e"/>
                     <line x1="0" y1="140" x2="320" y2="140" stroke="#333" stroke-width="1"/>
@@ -774,18 +772,17 @@
                     <text x="282" y="68" text-anchor="middle" fill="#f472b6" font-size="5" font-weight="bold" opacity="0.7">API</text>
                     <text x="282" y="74" text-anchor="middle" fill="#f472b6" font-size="4" opacity="0.5">MCP</text>
                 </svg>
-                <div class="office-popup-label" style="bottom:24px; left:12px; color:#DAA520; background:rgba(139,105,20,0.2); border:1px solid rgba(218,165,32,0.3);">Desk = HBM/DRAM (working memory)</div>
-                <div class="office-popup-label" style="bottom:24px; left:195px; color:#9ca3af; background:rgba(100,100,100,0.2); border:1px solid rgba(150,150,150,0.3);">Cabinet = SSD</div>
-                <div class="office-popup-label" style="bottom:68px; right:8px; color:#f472b6; background:rgba(244,114,182,0.15); border:1px solid rgba(244,114,182,0.3);">Tools = APIs / MCP</div>
+                <div class="office-popup-label" style="bottom:50px; left:12px; color:#DAA520; background:rgba(139,105,20,0.2); border:1px solid rgba(218,165,32,0.3);">Desk = HBM/DRAM (working memory)</div>
+                <div class="office-popup-label" style="bottom:50px; left:230px; color:#9ca3af; background:rgba(100,100,100,0.2); border:1px solid rgba(150,150,150,0.3);">Cabinet = SSD</div>
+                <div class="office-popup-label" style="bottom:30px; left:12px; color:#f472b6; background:rgba(244,114,182,0.15); border:1px solid rgba(244,114,182,0.3);">Tools = APIs / MCP</div>
             </div>
         </div>
         <div class="bld-label" style="color:#a78bfa;">Office</div>
         <div class="bld-analogy" style="color:#c4b5fd;">= GPU Inference Cluster</div>
-        <div class="bld-sub">Where agents go to work and think.<br>Hover to look inside</div>
     </div>
 
     <!-- ===== SALARY = TOKENS (flowing INTO office from left) ===== -->
-    <div style="position:absolute; top:260px; left:840px; z-index:7;">
+    <div style="position:absolute; top:350px; left:840px; z-index:7;">
         <svg width="170" height="130" viewBox="0 0 170 130">
             <path d="M 10,50 C 50,50 80,60 155,60" fill="none" stroke="#d97706" stroke-width="1.5" opacity="0.3" stroke-dasharray="6,4">
                 <animate attributeName="stroke-dashoffset" values="0;-20" dur="1.5s" repeatCount="indefinite"/>
@@ -829,15 +826,14 @@
         </svg>
     </div>
     <!-- Salary = Tokens label -->
-    <div style="position:absolute; top:258px; left:800px; z-index:8; text-align:right; width:140px;">
-        <div style="font-size:0.95rem; font-weight:900; color:#facc15; text-shadow: 0 0 12px rgba(250,204,21,0.3); letter-spacing:1px;">TOKENS IN</div>
+    <div style="position:absolute; top:310px; left:880px; z-index:8; text-align:center; width:120px;">
+        <div style="font-size:0.7rem; color:#b45309;">You pay your agents with tokens</div>
+        <div style="font-size:0.95rem; font-weight:900; color:#facc15; text-shadow: 0 0 12px rgba(250,204,21,0.3); letter-spacing:1px; margin-top:2px;">TOKENS IN</div>
         <div style="font-size:0.95rem; color:#d97706; font-weight:900; margin-top:3px; letter-spacing:1px;">= SALARY</div>
-        <div style="font-size:0.55rem; color:#92400e; margin-top:2px;">What you pay agents to work.</div>
-        <div style="font-size:0.55rem; color:#92400e;">Cost keeps dropping (deflationary).</div>
     </div>
 
     <!-- ===== GDP OUTPUT (flowing out of office to the right) ===== -->
-    <div style="position:absolute; top:280px; left:1130px; z-index:7;">
+    <div style="position:absolute; top:370px; left:1130px; z-index:7;">
         <svg width="200" height="120" viewBox="0 0 200 120">
             <path d="M 0,60 C 30,60 40,40 70,40 L 140,40" fill="none" stroke="#facc15" stroke-width="2" opacity="0.4" stroke-dasharray="6,4">
                 <animate attributeName="stroke-dashoffset" values="20;0" dur="1.5s" repeatCount="indefinite"/>
@@ -866,15 +862,14 @@
         </svg>
     </div>
     <!-- Output = GDP label -->
-    <div style="position:absolute; top:258px; left:1280px; z-index:8; text-align:left; width:140px;">
-        <div style="font-size:0.95rem; font-weight:900; color:#facc15; text-shadow: 0 0 12px rgba(250,204,21,0.3); letter-spacing:1px;">OUTPUT</div>
+    <div style="position:absolute; top:310px; left:1180px; z-index:8; text-align:center; width:120px;">
+        <div style="font-size:0.7rem; color:#b45309;">Tasks completed,<br>code written,<br>decisions made</div>
+        <div style="font-size:0.95rem; font-weight:900; color:#facc15; text-shadow: 0 0 12px rgba(250,204,21,0.3); letter-spacing:1px; margin-top:2px;">OUTPUT</div>
         <div style="font-size:0.95rem; color:#d97706; font-weight:900; margin-top:3px; letter-spacing:1px;">= GDP</div>
-        <div style="font-size:0.55rem; color:#92400e; margin-top:2px;">Tasks completed, code written,</div>
-        <div style="font-size:0.55rem; color:#92400e;">decisions made, analyses run.</div>
     </div>
 
     <!-- ===== HOUSES (CPU) — Row 1 left ===== -->
-    <div class="building" style="top:400px; left:80px;">
+    <div class="building" style="top:370px; left:80px;">
         <div class="bld-body">
             <svg class="house-svg" viewBox="0 0 100 90">
                 <rect x="15" y="40" width="70" height="45" rx="2" fill="#2d4a2d" stroke="#538135" stroke-width="1.5"/>
@@ -892,7 +887,6 @@
         </div>
         <div class="bld-label" style="color:#538135;">Houses</div>
         <div class="bld-analogy" style="color:#7bc96f;">= CPU Cores</div>
-        <div class="bld-sub">Every agent needs a house to exist.<br>No CPU = agent is dead.</div>
         <div class="bld-tooltip">
             <strong>House = CPU</strong><br>
             Every agent needs a persistent CPU process to exist. Like a heartbeat. No CPU = the agent is dead. Scales linearly with population.
@@ -900,7 +894,7 @@
     </div>
 
     <!-- Second house -->
-    <div class="building" style="top:420px; left:210px;">
+    <div class="building" style="top:390px; left:210px;">
         <div class="bld-body">
             <svg class="house-svg" viewBox="0 0 100 90" style="width:80px;height:72px;">
                 <rect x="15" y="40" width="70" height="45" rx="2" fill="#2d4a2d" stroke="#538135" stroke-width="1.5"/>
@@ -912,7 +906,7 @@
         </div>
     </div>
     <!-- Third house -->
-    <div class="building" style="top:435px; left:310px;">
+    <div class="building" style="top:400px; left:310px;">
         <div class="bld-body">
             <svg class="house-svg" viewBox="0 0 100 90" style="width:70px;height:63px;">
                 <rect x="15" y="40" width="70" height="45" rx="2" fill="#2d4a2d" stroke="#538135" stroke-width="1.5"/>
@@ -925,7 +919,7 @@
     </div>
 
     <!-- ===== POWER PLANT / FARM (Electricity) — Row 2 right ===== -->
-    <div class="building" style="top:580px; left:900px;">
+    <div class="building" style="top:580px; left:995px;">
         <div class="bld-body">
             <svg class="power-svg" viewBox="0 0 130 100">
                 <rect x="0" y="70" width="130" height="30" rx="2" fill="#1a3520"/>
@@ -956,7 +950,6 @@
         </div>
         <div class="bld-label" style="color:#ef4444;">Farm</div>
         <div class="bld-analogy" style="color:#f87171;">= Electricity (Food for Agents)</div>
-        <div class="bld-sub">Every house, office, and road needs power.<br>The ultimate constraint.</div>
         <div class="bld-tooltip">
             <strong>Electricity = Food</strong><br>
             Just as humans need calories to survive and work, agents need electricity. Every house (CPU), every office (GPU), every road (network) consumes it. The ultimate physical constraint.
@@ -966,19 +959,20 @@
     <!-- Power lines from farm to buildings -->
     <svg style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:3;pointer-events:none;">
         <!-- Power line to houses -->
-        <line x1="920" y1="600" x2="200" y2="450" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+        <line x1="920" y1="600" x2="200" y2="470" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
         <!-- Power line to university -->
-        <line x1="940" y1="590" x2="590" y2="400" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+        <line x1="940" y1="590" x2="590" y2="470" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
         <!-- Power line to office -->
-        <line x1="980" y1="590" x2="1060" y2="420" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
+        <line x1="980" y1="590" x2="1060" y2="500" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
         <!-- Power line to library -->
         <line x1="920" y1="620" x2="300" y2="630" stroke="#ef4444" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>
     </svg>
 
+
     <!-- Agent commute annotation -->
-    <div style="position:absolute; top:505px; left:550px; z-index:6; text-align:center;">
-        <div style="font-size:0.55rem; color:rgba(255,255,255,0.3); font-style:italic;">Agents commuting between home and office</div>
-        <div style="font-size:0.5rem; color:rgba(255,255,255,0.2);">(Latency = commute time)</div>
+    <div style="position:absolute; top:575px; left:630px; transform:translateX(-50%); z-index:6; text-align:center;">
+        <div style="font-size:0.7rem; color:rgba(255,255,255,0.45); font-style:italic;">Agents commuting between home and office</div>
+        <div style="font-size:0.65rem; color:rgba(255,255,255,0.35);">(Latency = commute time)</div>
     </div>
 
     <!-- ===== WALKING AGENTS ===== -->
@@ -1067,7 +1061,7 @@
     </div>
 
     <!-- ===== RESIDENTIAL SIGN ===== -->
-    <div style="position:absolute; top:380px; left:100px; z-index:6;">
+    <div style="position:absolute; top:350px; left:100px; z-index:6;">
         <svg viewBox="0 0 130 60" style="width:130px;height:60px;">
             <rect x="60" y="35" width="4" height="25" fill="#666"/>
             <rect x="5" y="3" width="115" height="34" rx="5" fill="#1a3520" stroke="#538135" stroke-width="1.5"/>
